@@ -1,0 +1,24 @@
+name: Continuous Integration
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: coursier/setup-action@v1
+      with:
+        jvm: adopt:1.8
+        apps: sbtn sbt
+    - run: sbtn coreJVM / test
+    - run: sbtn coreJS / test
+    - run: sbtn engine / test
+    - run: npm install
+    - run: sbtn webpage / test
+    - run: sbtn server / test
