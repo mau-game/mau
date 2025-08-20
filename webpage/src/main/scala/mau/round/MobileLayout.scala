@@ -34,7 +34,7 @@ object MobileLayout:
       case ((player, handSize), i) =>
         val origin = otherPlayerOrigin(i, round.otherPlayers.size)
         player -> otherPlayerLayout(player, handSize, origin, frameSize, params)
-    val penalty = PenaltyBox(left = frameSize.width / 3, bottom = 2 * frameSize.height / 3 + cardSize.height / 2, width = frameSize.width / 3)
+    val penalty = PenaltyBox(left = frameSize.width / 4, bottom = 2 * frameSize.height / 3 + cardSize.height / 2, width = frameSize.width / 2)
     val stackPos = Position((frameSize.width - discardStackSpacing - cardSize.width) / 2 , frameSize.height / 3)
     val discardPos = Position((frameSize.width + discardStackSpacing + cardSize.width) / 2, frameSize.height / 3)
     val stack = ElementLayout("stack", stackPos, cardSize, scale = 1.0, zIndex = 1, rotation = 0)

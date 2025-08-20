@@ -80,7 +80,7 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[Option
     val $effect = $round.map(_.effect).changes
     val $penalty = $effect.collect { case Some(p: EffectProjection.Penalised) => p } 
     val $penaltyBox = $layout.map(_.penalty)
-    child <-- $penalty.withTiming(2000).map:
+    child <-- $penalty.withTiming(3000).map:
       case Some(EffectProjection.Penalised(player, _, action, _, reason)) =>
         div(
           idAttr := "penalty",
