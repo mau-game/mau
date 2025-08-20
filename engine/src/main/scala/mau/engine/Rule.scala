@@ -296,7 +296,8 @@ object Rule:
   val baseRules: Seq[InMemoryRule] = Seq(
     //anyCard,
     //anyClick,
-    // anyTurn,
+    //anyTurn,
+    haveANiceDay,
     winRound,
     lastCard,
     sameRank,
