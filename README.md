@@ -7,4 +7,4 @@
 
 ## Website
 
-[mau-game.org](mau-game.org)
+[mau-game.org](www.mau-game.org)
