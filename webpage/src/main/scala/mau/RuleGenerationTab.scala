@@ -57,7 +57,7 @@ class RuleGenerationTab(you: Player, send: Observer[Command], syntaxHighlighting
             div(className := "spinner"),
             div(
               className := "loading-text",
-              "Checking the rules with the Party officials..."
+              "Analysing the request..."
             ),
             button("Abort", onClick.mapTo(()) --> abortBus)
           )
