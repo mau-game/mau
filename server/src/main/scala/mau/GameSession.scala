@@ -101,11 +101,11 @@ class GameSession(ruleExecutor: RuleExecutor, generator: RuleGenerator, engine: 
     state.project(user).foreach(proj => connection.send(Ws.Text(Printer.noSpaces.print(proj.asJson))))
 
 object GameSession:
-  def apply(generatorPassword: String)(using ExecutionContext): GameSession =
+  def apply(genApiKey: String)(using ExecutionContext): GameSession =
     val workspace = Workspace.init()
     val classpath = Properties.javaClassPath.split(':').map(Paths.get(_))
     val ruleExecutor = RuleExecutor(workspace, classpath)
-    val generator = RuleGenerator("l47vg0b974.execute-api.eu-west-1.amazonaws.com", generatorPassword, ruleExecutor)
+    val generator = RuleGenerator("l47vg0b974.execute-api.eu-west-1.amazonaws.com", genApiKey, ruleExecutor)
     val gameEngine = GameEngine(ruleExecutor)
     new GameSession(ruleExecutor, generator, gameEngine)
 
