@@ -37,7 +37,7 @@ class GameSession(ruleExecutor: RuleExecutor, generator: RuleGenerator, engine: 
         connection.run(Ws.Ping())
         true
       catch case e: IOException =>
-        println(s"$user has disconnected")
+        println(s"websocket of $user has disconnected")
         false
 
   def removeUser(user: User): Unit =

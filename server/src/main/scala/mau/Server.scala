@@ -45,10 +45,16 @@ object Server extends MainRoutes:
   @mau.postJson("/login")
   def login(params: LoginParams)(username: String): Response[String] =
     this.synchronized:
-      if gameSessions.forall(_.isFull)then Response("Too many users. Please try again later.", statusCode = 409)
+      if gameSessions.forall(_.isFull) then
+        println(s"$username cannot login because too many users")
+        Response("Too many users. Please try again later.", statusCode = 409)
       else userManager.createUser(username, params.avatar) match
-        case Some(sessionId) => Response("", cookies = Seq(Cookie("sessionId", sessionId)))
-        case None => Response(s"$username is already taken", statusCode = 401)
+        case Some(sessionId) =>
+          println(s"$username has joined the game")
+          Response("", cookies = Seq(Cookie("sessionId", sessionId)))
+        case None =>
+          println(s"$username cannot login because already taken")
+          Response(s"$username is already taken", statusCode = 401)
 
   @loggedIn
   @post("/logout")

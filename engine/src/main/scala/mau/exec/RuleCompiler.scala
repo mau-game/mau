@@ -25,6 +25,7 @@ import scala.meta.internal.metals.EmptyCancelToken
 import scala.meta.internal.pc.PresentationCompilerConfigImpl
 import scala.meta.pc.CompletionItemPriority
 import scala.meta.pc.PresentationCompiler
+import dotty.tools.dotc.reporting.StoreReporter
 
 object RuleCompiler:
   // private[mau] def default: RuleCompiler =
@@ -79,7 +80,9 @@ class RuleCompiler(pc: PresentationCompiler, classpath: Seq[Path])(using Executi
 
   def compile(source: RuleSource, targetDir: Path, sourceFile: Path): CompilationReport =
     val args = Array("-cp", classpath.mkString(":"), "-d", targetDir.toString, sourceFile.toString)
-    CompilationReport(source.code, dotc.Main.process(args).allErrors.map(source.toDiagnostic))
+    val reporter = StoreReporter()
+    dotc.Main.process(args, reporter = reporter)
+    CompilationReport(source.code, reporter.allErrors.map(source.toDiagnostic))
 
   def complete(source: RuleSource, ruleUri: URI, position: Int): Future[Seq[Completion]] =
     // TODO cancel completion

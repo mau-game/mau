@@ -56,7 +56,6 @@ class RuleExecutor(workspace: Workspace, classpath: Seq[Path])(using ExecutionCo
       val processBuilder = new ProcessBuilder("java", "-cp", classpath.mkString(":"), classOf[RuleWorker].getName)
       processBuilder.environment.remove("JAVA_JDK_OPTIONS")
       val process = processBuilder.redirectError(Redirect.INHERIT).start()
-      println(s"starting worker")
       WorkerClient(process)
 
   private class WorkerClient(process: Process):
@@ -97,16 +96,16 @@ class RuleExecutor(workspace: Workspace, classpath: Seq[Path])(using ExecutionCo
     private def readSanitizedLine(): String =
       val line = reader.readLine()
       if line.contains("org.jmxtrans") then
-        println(s"skipped $line")
+        // println(s"skipped $line")
         readSanitizedLine()
       else
         val CleverCloudLog = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z (.*)".r
         line match
           case CleverCloudLog(line) =>
-            println(s"Received and sanitized: $line")
+            // println(s"Received and sanitized: $line")
             line
           case line =>
-            println(s"Received $line")
+            // println(s"Received $line")
             line
 
     def shutdown(): Unit =
