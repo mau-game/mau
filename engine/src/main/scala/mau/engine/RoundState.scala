@@ -46,19 +46,16 @@ final case class RoundState(
       .drawCard(player)
 
   def validate(action: Action, player: Player): Unit =
-    try
-      assert(hands.contains(player))
-      assert(players.contains(player))
-      action match
-        case Action.Play(card) =>
-          assert(mustAct.isPlay)
-          assert(hands(player).contains(card))
-        case Action.Draw =>
-          assert(mustAct.isPlay)
-        case Action.ClickButton(button) => 
-          assert(mustAct.isPlay || mustAct.isClick(player))
-    catch case e: AssertionError =>
-      println(s"Assertion error on $action by $player")
+    assert(hands.contains(player))
+    assert(players.contains(player))
+    action match
+      case Action.Play(card) =>
+        assert(mustAct.isPlay)
+        assert(hands(player).contains(card))
+      case Action.Draw =>
+        assert(mustAct.isPlay)
+      case Action.ClickButton(button) => 
+        assert(mustAct.isPlay || mustAct.isClick(player))
 
   def playCard(player: Player, card: Card): RoundState =
     copy(

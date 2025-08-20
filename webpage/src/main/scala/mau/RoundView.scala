@@ -13,12 +13,12 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustActProjection], exitGame: Observer[Unit]):
+class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[Option[MustActProjection]], exitGame: Observer[Unit]):
   def apply($round: Signal[Round]): HtmlElement =
     div(
       idAttr := "round",
       className <-- $mustAct.map:
-        case MustActProjection.Click(p) => if p == you then "must-click" else "must-wait"
+        case Some(MustActProjection.Click(p)) => if p == you then "must-click" else "must-wait"
         case _ => "",
       navbar(exitGame),
       div(
@@ -28,7 +28,7 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
           val $layout = $round.combineWithFn($frameSize)(RoundLayout(you, _, _))
           val $animations = computeAnimations($round, $frameSize)
           Seq(
-            otherPlayers($round, $layout, $animations),
+            otherPlayers($round, $mustAct, $layout, $animations),
             penaltyBox($round, $layout),
             stackAndDiscard($round, $layout, $animations),
             mainPlayer($round, $layout, $animations)
@@ -50,7 +50,7 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
         case (None, _, _) => CardAnimations.empty // TODO should we compute animations on first load
 
 
-  private def otherPlayers($round: Signal[Round], $layout: Signal[RoundLayout], $animations: Signal[CardAnimations]): Modifier[HtmlElement] =
+  private def otherPlayers($round: Signal[Round], $mustAct: Signal[Option[MustActProjection]], $layout: Signal[RoundLayout], $animations: Signal[CardAnimations]): Modifier[HtmlElement] =
     val $effect = $round.map(_.effect)
     val $knownCards: Signal[Map[(Player, Int), Card]] = $round
       .map: round =>
@@ -64,7 +64,7 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
           .toMap
       .distinct
     Seq(
-      children <-- $round.map(_.otherPlayers).split((p, _) => p)({case (player, _, _) => otherPlayerProfile(player, $layout)}),
+      children <-- $round.map(_.otherPlayers).split((p, _) => p)({case (player, _, _) => otherPlayerProfile(player, $layout, $mustAct)}),
       children <-- $round
         .map: round =>
           for
@@ -120,16 +120,18 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
     )
 
   private def mainPlayer($round: Signal[Round], $layout: Signal[RoundLayout], $animations: Signal[CardAnimations]): Modifier[HtmlElement] =
-    val $cards = $round.map(_.hand.map(_.cards).getOrElse(Seq.empty)) 
+    val $cards = $round.map(_.hand.map(_.cards).getOrElse(Seq.empty))
     Seq(
       children(
         div(
           idAttr := s"player-${you.id}-profile",
           className := "player-profile",
-          className <-- $mustAct.map:
-            case MustActProjection.Play(p) if p == you => "must-play"
-            case MustActProjection.Click(p) if p == you => "must-click"
-            case _ => "must-wait", // Someone else must act
+          className <-- $mustAct.map: mustActOpt =>
+            mustActOpt match
+              case Some(MustActProjection.Play(p)) if p == you => "must-play"
+              case Some(MustActProjection.Click(p)) if p == you => "must-click"
+              case Some(_) => "must-wait" // Someone else must act
+              case None => "",
           withPosition(s"player-${you.id}-profile", $layout)
         ),
         yourMessages($round, $layout)
@@ -138,21 +140,11 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
         .map(_.hand.map(_.cards).getOrElse(Seq.empty))
         .split(identity):
           case (card, _, _) =>
-            val clickBus = EventBus[Unit]()
-            val playStream =
-              clickBus
-                .events
-                .flatMapSwitch:
-                  _ => $mustAct.map:
-                    case MustActProjection.Click(_) => None
-                    case _ => Some(Action.Play(card))
-                .collectSome
             div(
               idAttr := card.id,
               className := "card",
               frontAndBackFaces(card, isPlayable = true),
-              onClick.mapTo(()) --> clickBus,
-              playStream --> observer,
+              onClick.map(_ => Action.Play(card)) --> observer,
               withPosition(card.id, $layout),
               withAnimation(card.id, $animations),
             )
@@ -195,7 +187,7 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
               className := "button",
               b.name,
               disabled <-- $mustAct.map:
-                case MustActProjection.Click(p) if p != you => true
+                case Some(MustActProjection.Click(p)) if p != you => true
                 case _ => false,
               onClick.map(_ => Action.ClickButton(b)) --> observer
             )
@@ -227,15 +219,17 @@ class RoundView(you: Player, observer: Observer[Action], $mustAct: Signal[MustAc
       withAnimation(id, $animations),
     )
 
-  private def otherPlayerProfile(player: Player, $layout: Signal[RoundLayout]): Image =
+  private def otherPlayerProfile(player: Player, $layout: Signal[RoundLayout], $mustAct: Signal[Option[MustActProjection]]): Image =
     val id = s"player-${player.id}-profile"
     img(
       idAttr := id,
       className := "player-profile",
-      className <-- $mustAct.map:
-        case MustActProjection.Play(p) if p == player => "must-play"
-        case MustActProjection.Click(p) if p == player => "must-click"
-        case _ => "must-wait", // Someone else must act
+      className <-- $mustAct.map: mustActOpt =>
+        mustActOpt match
+          case Some(MustActProjection.Play(p)) if p == player => "must-play"
+          case Some(MustActProjection.Click(p)) if p == player => "must-click"
+          case Some(_) => "must-wait" // Someone else must act
+          case None => "",
       src := Assets.Avatars(player.user.avatar),
       alt := s"Player ${player.id} picture",
       withPosition(id, $layout)
