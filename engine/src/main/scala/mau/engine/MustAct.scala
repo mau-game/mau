@@ -23,7 +23,7 @@ enum MustAct:
 
 object MustAct:
   def play(player: Player): Play =
-    Play(Instant.now().plusMillis(5000), player)
+    Play(Instant.now().plusMillis(8000), player)
 
   def click(player: Player, buttons: Seq[Button]): Click =
-    Click(Instant.now().plusMillis(3000), player, buttons)
+    Click(Instant.now().plusMillis(5000), player, buttons)
