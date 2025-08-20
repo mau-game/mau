@@ -19,7 +19,9 @@ object Assets:
       "avatar-09" -> avatar9,
       "avatar-10" -> avatar10,
       "avatar-11" -> avatar11,
-      "avatar-12" -> avatar12
+      "avatar-12" -> avatar12,
+      "avatar-adrien" -> avatarAdrien,
+      "avatar-benoit" -> avatarBenoit
     )
 
     def apply(avatarId: String): String = all.getOrElse(avatarId, avatar0)
@@ -62,6 +64,12 @@ object Assets:
 
     @js.native @JSImport("/assets/avatars/avatar-12.png", JSImport.Default)
     val avatar12: String = js.native
+
+    @js.native @JSImport("/assets/avatars/avatar-adrien.png", JSImport.Default)
+    val avatarAdrien: String = js.native
+
+    @js.native @JSImport("/assets/avatars/avatar-benoit.png", JSImport.Default)
+    val avatarBenoit: String = js.native
 
   end Avatars
 
