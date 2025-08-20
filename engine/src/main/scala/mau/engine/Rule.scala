@@ -308,7 +308,6 @@ object Rule:
   )
 
   val additionalRules: Set[InMemoryRule] = Set(
-    haveANiceDay,
     diamondOnAny,
     noFaceOnFace,
     aceAtAnyTurn,
