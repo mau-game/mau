@@ -19,7 +19,9 @@ case class RuleSource(uid: String, code: String):
           |    {
           |""".stripMargin
     val prefixLines = prefix.count(_ == '\n')
-    val wrappedImpl: String = s"$prefix$code}}, \"$className\")"
+    val wrappedImpl: String =
+      s"""|$prefix$code
+          |}}, \"$className\")""".stripMargin
 
     def fromPosition(pos: Int): Int = prefix.size + pos
     def toPosition(offset: Int): Option[Int] =
