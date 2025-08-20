@@ -73,7 +73,7 @@ class RuleEditionTab(you: Player, initCompilation: CompilationReport, send: Obse
             div(className := "spinner"),
             div(
               className := "loading-text",
-              "Checking the rules with the Party officials..."
+              "Compiling rule..."
             )
           )
         else emptyNode,
