@@ -62,7 +62,7 @@ class GameEngine(executor: RuleExecutor, roundEngine: RoundEngine):
       case (RefreshSuggestions, Some(player)) if state.isDeliberating(player) =>
         Some(state.refreshSuggestions(player))
       case command =>
-        // println(s"Invalid $command during $state")
+        println(s"Invalid $command")
         None
 
   def tick(state: GameState, now: Instant): Option[GameState] =

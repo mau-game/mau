@@ -46,7 +46,7 @@ object Client:
             view match
               case roundInit: View.Round =>
                 val $round = viewStream.collect { case r: View.Round => r }.toSignal(roundInit).distinct
-                val $mustAct = $round.map(r => Some(r.mustAct))
+                val $mustAct = $round.map(r => r.mustAct)
                 val roundView = RoundView(init.you, sendAction, $mustAct, exitGame)($round)
                 // div(
                 //   history.elements,
