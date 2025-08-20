@@ -23,7 +23,7 @@ object Server extends MainRoutes:
 
   private val ec: ExecutionContext = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
   private val userManager = UserManager()
-  private val gameSessions = Seq.fill(4)(GameSession(genApiKey))
+  private val gameSessions = Seq.fill(1)(GameSession(genApiKey))
   private val userToGame = TrieMap.empty[User, GameSession]
 
   override def host: String = if isLocal then "localhost" else "0.0.0.0"
